@@ -1,2 +1,18 @@
 # Project exclude paths
 /out/
+#ignore the previous version of main.class in the OrderSystem
+main_prev.java
+
+#ignore the idea config folder
+.idea
+
+.idea/.gitignore
+.idea/codeStyles/
+.idea/description.html
+.idea/encodings.xml
+.idea/libraries/
+.idea/misc.xml
+.idea/modules.xml
+.idea/project-template.xml
+.idea/uiDesigner.xml
+.idea/vcs.xml

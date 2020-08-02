@@ -1,11 +1,15 @@
 package com.Wendys;
 
-import com.Wendys.Menu;
-import com.Wendys.Cust_Order;
-import com.Wendys.OrdersQueue;
-
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class Main {
 
@@ -16,10 +20,39 @@ public class Main {
     String customer_name="";
     int generated_customer_id=0;
 
+    //logger
+    static Logger logger=null;
+
     public static void main(String[] args) {
 
         //driver program
         Main main_driver=new Main();
+
+        //logger setup and configuration
+        String formattedDate = getDate();
+
+        //location for the log file : PROJECT_DIRECTORIES/logs/logfiles/
+        //example file pattern : systemLogs_2020-08-02 14_12.txt
+        final String filePath="logs/logfiles/systemLogs_" + formattedDate +".txt" ;
+
+        try {
+
+            InputStream stream = Main.class.getClassLoader().getResourceAsStream("logging.properties");
+
+            logger=Logger.getLogger(Main.class.getName());
+
+            LogManager.getLogManager().readConfiguration(stream);
+
+            Handler fileHandler = new FileHandler(filePath, true);
+
+            logger.addHandler(fileHandler);
+
+            logger.config("Logging File Location Configuration Done.");
+            logger.info(filePath);
+
+        } catch (IOException e) {
+            logger.warning(e.toString());
+        }
 
         //boolean to control the loop of the program
         //the program stop looping after run is updated to false
@@ -90,6 +123,10 @@ public class Main {
 
                         //there is only one left, so no more order can be display to staff.
                         if ( ordersQueue.size() == 1 ) {
+
+                            Cust_Order peekItem=ordersQueue.peek();
+                            logger.info("Completed order of " + peekItem.getCustomerName() + " and removed from the queue at " + getDate() );
+
                             ordersQueue.remove();
                             System.out.println("You Have Completed All Orders In The Queue.");
                             System.out.println("");
@@ -97,6 +134,9 @@ public class Main {
 
                         //orders in the queue are more than 1
                         else{
+
+                            Cust_Order peekItem=ordersQueue.peek();
+                            logger.info("Completed order of " + peekItem.getCustomerName() + " and removed from the queue at " + getDate() );
 
                             //remove the completed order from the order
                             ordersQueue.remove();
@@ -167,6 +207,14 @@ public class Main {
                 run=false;
             }
         }
+    }
+
+    private static String getDate() {
+
+        LocalDateTime myDateObj = LocalDateTime.now();
+        DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("yyyy-MM-dd HH_mm");
+
+        return myDateObj.format(myFormatObj);
     }
 
     /**
@@ -298,6 +346,8 @@ public class Main {
         if( valid_counter_counter == orderArray.length) {
             //add the customer's order into the order queue
             orderQueue.add(new Cust_Order(customer_name, ordered_items, totalPrice));
+
+            logger.info(customer_name + " made an order of total price of RM" + totalPrice + " at " + getDate() );
         }
         else{
             ordered=false;
